@@ -27,7 +27,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { getSecureRooms, joinSecureRoomApi, closeSecureRoomApi } from '../api/apiService.js'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://34.69.219.193:3000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.argussecure.online'
 
 // ─── Mapa de resolución a label/color ────────────────────────────────────────
 const RESOLUTION_META = {
