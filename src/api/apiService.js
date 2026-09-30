@@ -69,8 +69,8 @@ export const getAuditLogs = (params = {}) =>
 export const getManufactured = () =>
   api.get('/api/manufactured')
 
-export const addManufactured = (deviceId, imei = null, notes = null) =>
-  api.post('/api/manufactured', { deviceId, imei, notes })
+export const addManufactured = (deviceId, imei = null, notes = null, protocol = 'argus') =>
+  api.post('/api/manufactured', { deviceId, imei, notes, protocol })
 
 export const removeManufactured = (deviceId) =>
   api.delete(`/api/manufactured/${deviceId}`)

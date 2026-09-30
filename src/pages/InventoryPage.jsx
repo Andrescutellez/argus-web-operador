@@ -17,7 +17,10 @@ import { useEffect, useState } from 'react'
 import { getManufactured, addManufactured, removeManufactured } from '../api/apiService.js'
 import { useStore } from '../store/useStore.js'
 
-const EMPTY_FORM = { deviceId: '', imei: '', notes: '' }
+const EMPTY_FORM = { deviceId: '', imei: '', notes: '', protocol: 'argus' }
+
+const PROTOCOL_LABELS = { argus: 'Argus Pro (ESP32)', gt06: 'Argus One (J16)' }
+const PROTOCOL_COLORS = { argus: '#FF6B35', gt06: '#2F81F7' }
 
 const inputStyle = {
   fontSize: 13, padding: '9px 12px',
@@ -58,7 +61,7 @@ export default function InventoryPage() {
     setError(null)
     setSuccess(null)
     try {
-      await addManufactured(form.deviceId.trim(), form.imei.trim() || null, form.notes.trim() || null)
+      await addManufactured(form.deviceId.trim(), form.imei.trim() || null, form.notes.trim() || null, form.protocol)
       setSuccess(`${form.deviceId.trim()} registrado correctamente`)
       setForm(EMPTY_FORM)
       await load()
@@ -157,6 +160,18 @@ export default function InventoryPage() {
             />
           </div>
 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 180 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text2)' }}>Modelo</label>
+            <select
+              value={form.protocol}
+              onChange={(e) => setForm((f) => ({ ...f, protocol: e.target.value }))}
+              style={{ ...inputStyle, fontFamily: 'inherit', cursor: 'pointer' }}
+            >
+              <option value="argus">Argus Pro (ESP32)</option>
+              <option value="gt06">Argus One (J16)</option>
+            </select>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 200 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text2)' }}>Notas</label>
             <input
@@ -207,7 +222,7 @@ export default function InventoryPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Device ID', 'IMEI', 'Notas', 'Registrado', 'Acción'].map((h) => (
+                {['Device ID', 'IMEI', 'Modelo', 'Notas', 'Registrado', 'Acción'].map((h) => (
                   <th key={h} style={{
                     padding: '12px 16px',
                     textAlign: 'left',
@@ -236,6 +251,16 @@ export default function InventoryPage() {
                   <td style={{ padding: '12px 16px' }}>
                     <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text2)' }}>
                       {d.imei ?? '—'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, padding: '3px 8px',
+                      borderRadius: 6,
+                      background: `${PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35'}22`,
+                      color: PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35',
+                    }}>
+                      {PROTOCOL_LABELS[d.device_protocol] ?? d.device_protocol}
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
