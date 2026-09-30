@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import { getManufactured, addManufactured, removeManufactured } from '../api/apiService.js'
+import { getManufactured, addManufactured, removeManufactured, patchManufactured } from '../api/apiService.js'
 import { useStore } from '../store/useStore.js'
 
 const EMPTY_FORM = { deviceId: '', imei: '', notes: '', protocol: 'argus' }
@@ -33,12 +33,14 @@ const inputStyle = {
 export default function InventoryPage() {
   const user = useStore((s) => s.user)
 
-  const [devices,  setDevices]  = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [form,     setForm]     = useState(EMPTY_FORM)
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState(null)
-  const [success,  setSuccess]  = useState(null)
+  const [devices,      setDevices]      = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [form,         setForm]         = useState(EMPTY_FORM)
+  const [saving,       setSaving]       = useState(false)
+  const [error,        setError]        = useState(null)
+  const [success,      setSuccess]      = useState(null)
+  const [editingId,    setEditingId]    = useState(null)
+  const [editProtocol, setEditProtocol] = useState('argus')
 
   const load = async () => {
     setLoading(true)
@@ -69,6 +71,24 @@ export default function InventoryPage() {
       setError(err.response?.data?.message ?? 'Error al registrar')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleEditStart = (d) => {
+    setEditingId(d.device_id)
+    setEditProtocol(d.device_protocol ?? 'argus')
+  }
+
+  const handleEditSave = async (deviceId) => {
+    setError(null)
+    setSuccess(null)
+    try {
+      await patchManufactured(deviceId, editProtocol)
+      setSuccess(`Protocolo de ${deviceId} actualizado`)
+      setEditingId(null)
+      await load()
+    } catch (err) {
+      setError(err.response?.data?.message ?? 'Error al actualizar')
     }
   }
 
@@ -254,14 +274,53 @@ export default function InventoryPage() {
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <span style={{
-                      fontSize: 11, fontWeight: 600, padding: '3px 8px',
-                      borderRadius: 6,
-                      background: `${PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35'}22`,
-                      color: PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35',
-                    }}>
-                      {PROTOCOL_LABELS[d.device_protocol] ?? d.device_protocol}
-                    </span>
+                    {editingId === d.device_id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <select
+                          value={editProtocol}
+                          onChange={(e) => setEditProtocol(e.target.value)}
+                          style={{ ...inputStyle, width: 'auto', fontSize: 12, padding: '4px 8px' }}
+                        >
+                          <option value="argus">Argus Pro (ESP32)</option>
+                          <option value="gt06">Argus One (J16)</option>
+                        </select>
+                        <button
+                          onClick={() => handleEditSave(d.device_id)}
+                          style={{
+                            fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6,
+                            border: 'none', background: 'var(--blue)', color: '#fff', cursor: 'pointer',
+                          }}
+                        >✓</button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          style={{
+                            fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 6,
+                            border: '1px solid var(--border)', background: 'none',
+                            color: 'var(--text3)', cursor: 'pointer',
+                          }}
+                        >✕</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{
+                          fontSize: 11, fontWeight: 600, padding: '3px 8px',
+                          borderRadius: 6,
+                          background: `${PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35'}22`,
+                          color: PROTOCOL_COLORS[d.device_protocol] ?? '#FF6B35',
+                        }}>
+                          {PROTOCOL_LABELS[d.device_protocol] ?? d.device_protocol}
+                        </span>
+                        <button
+                          onClick={() => handleEditStart(d)}
+                          title="Editar modelo"
+                          style={{
+                            fontSize: 11, padding: '2px 6px', borderRadius: 5,
+                            border: '1px solid var(--border)', background: 'none',
+                            color: 'var(--text3)', cursor: 'pointer',
+                          }}
+                        >✎</button>
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <span style={{ fontSize: 12, color: 'var(--text3)' }}>

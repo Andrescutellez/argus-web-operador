@@ -72,6 +72,9 @@ export const getManufactured = () =>
 export const addManufactured = (deviceId, imei = null, notes = null, protocol = 'argus') =>
   api.post('/api/manufactured', { deviceId, imei, notes, protocol })
 
+export const patchManufactured = (deviceId, protocol) =>
+  api.patch(`/api/manufactured/${deviceId}`, { protocol })
+
 export const removeManufactured = (deviceId) =>
   api.delete(`/api/manufactured/${deviceId}`)
 
