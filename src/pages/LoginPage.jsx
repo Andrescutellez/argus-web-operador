@@ -48,7 +48,7 @@ export default function LoginPage() {
       <div className="argus-fadein" style={{ width: '100%', maxWidth: 420, position: 'relative' }}>
 
         {/* Logo + badge OPS */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
           <img src={logoDark} alt="Argus Secure" style={{ width: 210 }} />
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12,
@@ -100,7 +100,6 @@ export default function LoginPage() {
                 marginTop: 4, padding: '13px 0', borderRadius: 12, border: 'none',
                 fontSize: 14.5, fontWeight: 700, letterSpacing: '0.3px', color: '#fff',
                 background: 'linear-gradient(135deg, #1A6FD4, #0F3060)',
-                boxShadow: loading ? 'none' : '0 8px 22px rgba(26,111,212,0.4)',
                 opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'opacity 0.15s, box-shadow 0.15s',
               }}
