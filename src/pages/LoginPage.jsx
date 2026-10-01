@@ -99,7 +99,7 @@ export default function LoginPage() {
               style={{
                 marginTop: 4, padding: '13px 0', borderRadius: 12, border: 'none',
                 fontSize: 14.5, fontWeight: 700, letterSpacing: '0.3px', color: '#fff',
-                background: 'linear-gradient(135deg, #1A6FD4, #0F3060)',
+                background: '#1A6FD4',
                 opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'opacity 0.15s, box-shadow 0.15s',
               }}
